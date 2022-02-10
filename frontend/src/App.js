@@ -30,18 +30,10 @@ const App = () => {
   if (isLoggedIn) {
     routes = (
       <Switch>
-        <Route path="/" exact>
-          <Users />
-        </Route>
-        <Route path="/:userId/places" exact>
-          <UserPlaces />
-        </Route>
-        <Route path="/places/new" exact>
-          <NewPlace />
-        </Route>
-        <Route path="/places/:placeId">
-          <UpdatePlace />
-        </Route>
+        <Route path="/" element={<Users />} exact />
+        <Route path="/:userId/places" element={<UserPlaces />} exact />
+        <Route path="/places/new" element={<NewPlace />} exact />
+        <Route path="/places/:placeId" element={<UpdatePlace />} />
         <Redirect to="/" />
       </Switch>
     );
