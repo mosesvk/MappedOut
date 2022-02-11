@@ -1,5 +1,5 @@
 import asyncHandler from 'express-async-handler';
-import { HttpError } from '../middleware/errorHandler.js';
+import { HttpError } from '../models/errorHandler.js';
 
 const DUMMY_PLACES = [
   {

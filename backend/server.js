@@ -2,7 +2,7 @@ import express from 'express'
 import bodyParser from 'body-parser'
 
 import placesRoutes from './routes/places_routes.js'
-import { errorHandler } from './middleware/errorHandler.js';
+import { errorHandler } from './models/errorHandler.js';
 
 const app = express();
 
