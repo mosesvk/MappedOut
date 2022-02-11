@@ -5,6 +5,7 @@ import placesRoutes from './routes/places_routes.js'
 
 const app = express();
 
-app.use(placesRoutes)
+app.use('/api/places', placesRoutes)
+// app.use('/api/users', usersRoutes)
 
-app.listen(5555)
+app.listen(5000)
