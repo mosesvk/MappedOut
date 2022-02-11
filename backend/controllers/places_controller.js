@@ -53,12 +53,12 @@ const getPlaceByPlaceId = asyncHandler(async (req, res) => {
 //@access   Public
 const getPlacesByUserId = asyncHandler(async (req, res) => {
   const userId = req.params.uid;
-  const places = DUMMY_PLACES.find((p) => {
+  const places = DUMMY_PLACES.filter((p) => {
     return p.creator === userId;
   });
 
-  if (!places) {
-    const error = new Error('Could not find a place for the provided User id.');
+  if (!places || places.length === 0) {
+    const error = new Error('Could not find a places for the provided User id.');
     error.code = 404;
     throw error;
   }
