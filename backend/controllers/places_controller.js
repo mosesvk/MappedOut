@@ -1,4 +1,4 @@
-import {v4 as uuid} from 'uuid'
+import { v4 as uuid } from 'uuid';
 import asyncHandler from 'express-async-handler';
 import { HttpError } from '../models/errorHandler.js';
 
@@ -66,7 +66,7 @@ const getPlacesByUserId = asyncHandler(async (req, res) => {
   res.json({ places });
 });
 
-//@desc     Create Place
+//@desc     CREATE Place
 //@route    GET /api/places
 //@access   Public
 const createPlace = (req, res, next) => {
@@ -85,4 +85,35 @@ const createPlace = (req, res, next) => {
   res.status(201).json({ place: createdPlace });
 };
 
-export { getPlaces, getPlaceByPlaceId, getPlacesByUserId, createPlace };
+//@desc     UPDATE Place
+//@route    GET /api/places/:pid
+//@access   Public
+const updatePlace = (req, res, next) => {
+  const {title, description, address} = req.body;
+  const placeId = req.params.pid;
+
+  const updatedPlace ={...DUMMY_PLACES.find(p => p.id === placeId)}
+  // we only want to make a copy of it first so that once that copy is updated... THEN we can replace the actual dummy_places array with the updated copy. 
+  const placeIndex = DUMMY_PLACES.findIndex(p => p.id === placeId)
+
+  updatedPlace.title = title;
+  updatedPlace.description = description;
+
+  DUMMY_PLACES[placeIndex] = updatedPlace;
+
+  res.status(200).json({place: updatedPlace})
+};
+
+//@desc     DELETE Place
+//@route    GET /api/places/:pid
+//@access   Public
+const deletePlace = (req, res, next) => {};
+
+export {
+  getPlaces,
+  getPlaceByPlaceId,
+  getPlacesByUserId,
+  createPlace,
+  updatePlace,
+  deletePlace,
+};
