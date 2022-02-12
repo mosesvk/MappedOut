@@ -3,6 +3,7 @@ import bodyParser from 'body-parser';
 import colors from 'colors';
 import mongoose from 'mongoose';
 import connectDB from './config/db.js';
+import dotenv from 'dotenv';
 
 import placesRoutes from './routes/places_routes.js';
 import userRoutes from './routes/users_routes.js';
@@ -12,7 +13,9 @@ const app = express();
 
 connectDB();
 
-const PORT = process.env.PORT
+dotenv.config();
+
+const PORT = process.env.PORT;
 
 app.use(bodyParser.json());
 

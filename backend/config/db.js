@@ -1,8 +1,13 @@
 import mongoose from 'mongoose';
+import dotenv from 'dotenv';
+
 
 const connectDB = async () => {
+  dotenv.config();
+
+  console.log(process.env.MONGO_URI)
   try {
-    console.log(process.env)
+
     const conn = await mongoose.connect(process.env.MONGO_URI);
 
     console.log(`MongoDB Connected: ${conn.connection.host}`.cyan.underline);
