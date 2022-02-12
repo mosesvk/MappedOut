@@ -21,20 +21,24 @@ const getPlaces = asyncHandler(async (req, res) => {
 //@access   Public
 const getPlaceByPlaceId = asyncHandler(async (req, res) => {
   const placeId = req.params.pid;
-  const place = DUMMY_PLACES.find((p) => {
-    return p.id === placeId;
-  });
 
-  if (!place) {
-    const error = new HttpError(
-      'Could not find a place for the provided User id.'
-    );
-    error.code = 404;
-    throw error;
+  let place;
+  try {
+    place = await Place.findById(placeId);
+  } catch (error) {
+    throw new HttpError('Something went wrong, could not find a Place', 500);
   }
 
-  res.json({ place });
-  f; // => {place} => { place: place }
+  if (!place) {
+    throw new HttpError(
+      'Could not find a place for the provided User id.',
+      404
+    );
+  }
+
+  // remember 'place' is a mongoose object now with all it's properties. We want to change this to a normal JavaScript object because it will be easier to work with that's why we use the .toObject()
+  // And also the {getters: true} is to get rid of the underscore in "_id" which is a default through Mongoose... so we can just have the normal "id". 
+  res.json({ place: place.toObject({ getters: true }) });
 });
 
 //@desc     Fetch place by User ID
@@ -84,14 +88,15 @@ const createPlace = asyncHandler(async (req, res, next) => {
     description,
     address,
     location: coordinates,
-    image: 'https://mpng.subpng.com/20180411/rzw/kisspng-user-profile-computer-icons-user-interface-mystique-5aceb0245aa097.2885333015234949483712.jpg',
-    creator
+    image:
+      'https://mpng.subpng.com/20180411/rzw/kisspng-user-profile-computer-icons-user-interface-mystique-5aceb0245aa097.2885333015234949483712.jpg',
+    creator,
   });
 
   try {
-    createdPlace.save()
+    createdPlace.save();
   } catch (error) {
-    return next(new HttpError('Creating Place Failed, please try again', 500))
+    return next(new HttpError('Creating Place Failed, please try again', 500));
   }
 
   res.status(201).json({ place: createdPlace });
