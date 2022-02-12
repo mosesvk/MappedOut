@@ -1,4 +1,5 @@
 import { v4 as uuid } from 'uuid';
+import { validationResult } from 'express-validator';
 import asyncHandler from 'express-async-handler';
 import { HttpError } from '../models/errorHandler.js';
 
@@ -58,7 +59,9 @@ const getPlacesByUserId = asyncHandler(async (req, res) => {
   });
 
   if (!places || places.length === 0) {
-    const error = new Error('Could not find a places for the provided User id.');
+    const error = new Error(
+      'Could not find a places for the provided User id.'
+    );
     error.code = 404;
     throw error;
   }
@@ -70,6 +73,12 @@ const getPlacesByUserId = asyncHandler(async (req, res) => {
 //@route    GET /api/places
 //@access   Public
 const createPlace = (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    console.log(errors);
+    throw new HttpError('Invalid inputs passed, please check your data', 422);
+  }
+
   const { title, description, coordinates, address, creator } = req.body;
   const createdPlace = {
     id: uuid(),
@@ -89,28 +98,28 @@ const createPlace = (req, res, next) => {
 //@route    GET /api/places/:pid
 //@access   Public
 const updatePlace = (req, res, next) => {
-  const {title, description, address} = req.body;
+  const { title, description, address } = req.body;
   const placeId = req.params.pid;
 
-  const updatedPlace ={...DUMMY_PLACES.find(p => p.id === placeId)}
-  // we only want to make a copy of it first so that once that copy is updated... THEN we can replace the actual dummy_places array with the updated copy. 
-  const placeIndex = DUMMY_PLACES.findIndex(p => p.id === placeId)
+  const updatedPlace = { ...DUMMY_PLACES.find((p) => p.id === placeId) };
+  // we only want to make a copy of it first so that once that copy is updated... THEN we can replace the actual dummy_places array with the updated copy.
+  const placeIndex = DUMMY_PLACES.findIndex((p) => p.id === placeId);
 
   updatedPlace.title = title;
   updatedPlace.description = description;
 
   DUMMY_PLACES[placeIndex] = updatedPlace;
 
-  res.status(200).json({place: updatedPlace})
+  res.status(200).json({ place: updatedPlace });
 };
 
 //@desc     DELETE Place
 //@route    GET /api/places/:pid
 //@access   Public
 const deletePlace = (req, res, next) => {
-  const placeId = req.params.pid
-  DUMMY_PLACES = DUMMY_PLACES.filter(p => p.id !== placeId);
-  res.status(200).json({message: 'Deleted Place!'})
+  const placeId = req.params.pid;
+  DUMMY_PLACES = DUMMY_PLACES.filter((p) => p.id !== placeId);
+  res.status(200).json({ message: 'Deleted Place!' });
 };
 
 export {

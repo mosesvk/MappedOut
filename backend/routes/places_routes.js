@@ -1,4 +1,5 @@
 import express from 'express';
+import {check} from 'express-validator'
 import {
   getPlaceByPlaceId,
   getPlaces,
@@ -10,7 +11,12 @@ import {
 
 const router = express.Router();
 
-router.route('/').get(getPlaces).post(createPlace);
+router.post('/', [
+  check('title').trim().notEmpty(), 
+  check('description').isLength({ min: 5 }),
+  check('address').trim().notEmpty()
+], createPlace)
+router.get('/', getPlaces)
 router
   .route('/:pid')
   .get(getPlaceByPlaceId)
