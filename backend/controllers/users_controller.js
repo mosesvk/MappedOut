@@ -1,4 +1,5 @@
 import { v4 as uuid } from 'uuid';
+import {validationResult} from 'express-validator';
 import asyncHandler from 'express-async-handler';
 import { HttpError } from '../models/errorHandler.js';
 
@@ -14,14 +15,21 @@ const DUMMY_USERS = [
 //@desc     Fetch all users
 //@route    GET /api/users
 //@access   Private
-const getAllUsers = ((req, res, next) => {
+const getAllUsers = asyncHandler(async(req, res, next) => {
   res.json({users: DUMMY_USERS})
 })
 
 //@desc     register user
 //@route    POST /api/users
 //@access   Private
-const signup = ((req, res, next) => {
+const signup = asyncHandler(async(req, res, next) => {
+  // this validationResult is connected to the check() function. This is all through express-validator to validate information
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    console.log(errors);
+    throw new HttpError('Invalid inputs passed, please check your data', 422);
+  }
+  
   const {name, email, password} = req.body;
 
   // this code is to check if there is already a user with the same email
@@ -45,7 +53,7 @@ const signup = ((req, res, next) => {
 //@desc     login user
 //@route    GET /api/users
 //@access   Private
-const login = ((req, res, next) => {
+const login = asyncHandler(async(req, res, next) => {
   const {email, password} = req.body
 
   const identifiedUser = DUMMY_USERS.find(u => u.email === email)

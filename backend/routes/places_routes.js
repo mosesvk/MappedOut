@@ -20,8 +20,12 @@ router.get('/', getPlaces)
 router
   .route('/:pid')
   .get(getPlaceByPlaceId)
-  .patch(updatePlace)
   .delete(deletePlace);
+router.patch('/:pid', [
+  check('title').trim().notEmpty(),
+  check('description').isLength({ min: 5 }),
+  check('address').trim().notEmpty()
+], updatePlace)
 router.route('/user/:uid').get(getPlacesByUserId);
 
 export default router;

@@ -72,7 +72,8 @@ const getPlacesByUserId = asyncHandler(async (req, res) => {
 //@desc     CREATE Place
 //@route    GET /api/places
 //@access   Public
-const createPlace = (req, res, next) => {
+const createPlace = asyncHandler(async(req, res, next) => {
+  // this validationResult is connected to the check() function. This is all through express-validator to validate information
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     console.log(errors);
@@ -92,12 +93,19 @@ const createPlace = (req, res, next) => {
   DUMMY_PLACES.push(createdPlace); // or we can unshift it to add it to the beginning
 
   res.status(201).json({ place: createdPlace });
-};
+});
 
 //@desc     UPDATE Place
 //@route    GET /api/places/:pid
 //@access   Public
-const updatePlace = (req, res, next) => {
+const updatePlace = asyncHandler(async(req, res, next) => {
+  // this validationResult is connected to the check() function. This is all through express-validator to validate information
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    console.log(errors);
+    throw new HttpError('Invalid inputs passed, please check your data', 422);
+  }
+
   const { title, description, address } = req.body;
   const placeId = req.params.pid;
 
@@ -111,16 +119,21 @@ const updatePlace = (req, res, next) => {
   DUMMY_PLACES[placeIndex] = updatedPlace;
 
   res.status(200).json({ place: updatedPlace });
-};
+});
 
 //@desc     DELETE Place
 //@route    GET /api/places/:pid
 //@access   Public
-const deletePlace = (req, res, next) => {
+const deletePlace = asyncHandler(async(req, res, next) => {
   const placeId = req.params.pid;
+
+  if (!DUMMY_PLACES.find(p => p.id === placeId)) {
+    throw new HttpError('Could not find a place for that id.', 404)
+  }
+
   DUMMY_PLACES = DUMMY_PLACES.filter((p) => p.id !== placeId);
   res.status(200).json({ message: 'Deleted Place!' });
-};
+});
 
 export {
   getPlaces,
