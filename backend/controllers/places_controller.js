@@ -1,7 +1,8 @@
 import { v4 as uuid } from 'uuid';
+import asyncHandler from 'express-async-handler'
 import { validationResult } from 'express-validator';
-import asyncHandler from 'express-async-handler';
 import { HttpError } from '../models/errorHandler.js';
+import { getCoordsForAddress } from '../util/location.js';
 
 const DUMMY_PLACES = [
   {
@@ -77,16 +78,24 @@ const createPlace = asyncHandler(async(req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     console.log(errors);
-    throw new HttpError('Invalid inputs passed, please check your data', 422);
+    return next(new HttpError('Invalid inputs passed, please check your data', 422));
   }
 
-  const { title, description, coordinates, address, creator } = req.body;
+  const { title, description, address, creator } = req.body;
+
+  let coordinates;
+  try {
+    coordinates = await getCoordsForAddress(address);
+  } catch (error) {
+    return next(error);
+  }
+
   const createdPlace = {
     id: uuid(),
     title,
     description,
-    location: coordinates,
     address,
+    location: coordinates,
     creator,
   };
 
