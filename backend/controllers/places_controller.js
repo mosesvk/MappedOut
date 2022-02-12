@@ -1,22 +1,9 @@
 import { v4 as uuid } from 'uuid';
-import asyncHandler from 'express-async-handler'
+import asyncHandler from 'express-async-handler';
 import { validationResult } from 'express-validator';
 import { HttpError } from '../models/errorHandler.js';
 import { getCoordsForAddress } from '../util/location.js';
-
-const DUMMY_PLACES = [
-  {
-    id: 'p1',
-    title: 'Empire State building',
-    description: 'One of the most famous sky scrapers in the world',
-    location: {
-      lat: 40.7484474,
-      lng: -73.9871516,
-    },
-    address: '20 W 34th St, New York, NY 10001',
-    creator: 'u1',
-  },
-];
+import Place from '../models/placeModel.js';
 
 //@desc     Fetch all places
 //@route    GET /api/places
@@ -73,12 +60,14 @@ const getPlacesByUserId = asyncHandler(async (req, res) => {
 //@desc     CREATE Place
 //@route    GET /api/places
 //@access   Public
-const createPlace = asyncHandler(async(req, res, next) => {
+const createPlace = asyncHandler(async (req, res, next) => {
   // this validationResult is connected to the check() function. This is all through express-validator to validate information
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     console.log(errors);
-    return next(new HttpError('Invalid inputs passed, please check your data', 422));
+    return next(
+      new HttpError('Invalid inputs passed, please check your data', 422)
+    );
   }
 
   const { title, description, address, creator } = req.body;
@@ -90,16 +79,20 @@ const createPlace = asyncHandler(async(req, res, next) => {
     return next(error);
   }
 
-  const createdPlace = {
-    id: uuid(),
+  const createdPlace = new Place({
     title,
     description,
     address,
     location: coordinates,
-    creator,
-  };
+    image: 'https://mpng.subpng.com/20180411/rzw/kisspng-user-profile-computer-icons-user-interface-mystique-5aceb0245aa097.2885333015234949483712.jpg',
+    creator
+  });
 
-  DUMMY_PLACES.push(createdPlace); // or we can unshift it to add it to the beginning
+  try {
+    createdPlace.save()
+  } catch (error) {
+    return next(new HttpError('Creating Place Failed, please try again', 500))
+  }
 
   res.status(201).json({ place: createdPlace });
 });
@@ -107,7 +100,7 @@ const createPlace = asyncHandler(async(req, res, next) => {
 //@desc     UPDATE Place
 //@route    GET /api/places/:pid
 //@access   Public
-const updatePlace = asyncHandler(async(req, res, next) => {
+const updatePlace = asyncHandler(async (req, res, next) => {
   // this validationResult is connected to the check() function. This is all through express-validator to validate information
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -133,11 +126,11 @@ const updatePlace = asyncHandler(async(req, res, next) => {
 //@desc     DELETE Place
 //@route    GET /api/places/:pid
 //@access   Public
-const deletePlace = asyncHandler(async(req, res, next) => {
+const deletePlace = asyncHandler(async (req, res, next) => {
   const placeId = req.params.pid;
 
-  if (!DUMMY_PLACES.find(p => p.id === placeId)) {
-    throw new HttpError('Could not find a place for that id.', 404)
+  if (!DUMMY_PLACES.find((p) => p.id === placeId)) {
+    throw new HttpError('Could not find a place for that id.', 404);
   }
 
   DUMMY_PLACES = DUMMY_PLACES.filter((p) => p.id !== placeId);

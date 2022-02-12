@@ -1,10 +1,9 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import colors from 'colors';
-import mongoose from 'mongoose';
-import connectDB from './config/db.js';
 import dotenv from 'dotenv';
 
+import connectDB from './config/db.js';
 import placesRoutes from './routes/places_routes.js';
 import userRoutes from './routes/users_routes.js';
 import { errorHandler, HttpError } from './models/errorHandler.js';
