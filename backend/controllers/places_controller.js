@@ -9,8 +9,10 @@ import Place from '../models/placeModel.js';
 //@route    GET /api/places
 //@access   Public
 const getPlaces = asyncHandler(async (req, res) => {
+  let places
   try {
-    res.json({ place: DUMMY_PLACES });
+    places = await Place.find()
+    res.json({ places });
   } catch (error) {
     console.log(error.message);
   }
@@ -37,7 +39,7 @@ const getPlaceByPlaceId = asyncHandler(async (req, res) => {
   }
 
   // remember 'place' is a mongoose object now with all it's properties. We want to change this to a normal JavaScript object because it will be easier to work with that's why we use the .toObject()
-  // And also the {getters: true} is to get rid of the underscore in "_id" which is a default through Mongoose... so we can just have the normal "id". 
+  // And also the {getters: true} is to get rid of the underscore in "_id" which is a default through Mongoose... so we can just have the normal "id".
   res.json({ place: place.toObject({ getters: true }) });
 });
 
@@ -46,19 +48,29 @@ const getPlaceByPlaceId = asyncHandler(async (req, res) => {
 //@access   Public
 const getPlacesByUserId = asyncHandler(async (req, res) => {
   const userId = req.params.uid;
-  const places = DUMMY_PLACES.filter((p) => {
-    return p.creator === userId;
-  });
+
+  let places;
+  try {
+    places = Place.find({ creator: userId });
+  } catch (err) {
+    const error = new HttpError(
+      'Fetching places failed, please try again later',
+      500
+    );
+    return next(error);
+  }
 
   if (!places || places.length === 0) {
     const error = new Error(
-      'Could not find a places for the provided User id.'
+      'Could not find any places for the provided User id.'
     );
     error.code = 404;
     throw error;
   }
 
-  res.json({ places });
+  res.json({
+    places: (await places).map((place) => place.toObject({ getters: true })),
+  });
 });
 
 //@desc     CREATE Place
