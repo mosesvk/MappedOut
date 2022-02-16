@@ -11,7 +11,7 @@ import Place from '../models/placeModel.js';
 const getPlaces = asyncHandler(async (req, res) => {
   let places;
   try {
-    places = await Place.find();
+    places = await Place.find()
     res.json({ places });
   } catch (error) {
     console.log(error.message);
@@ -162,11 +162,23 @@ const updatePlace = asyncHandler(async (req, res, next) => {
 const deletePlace = asyncHandler(async (req, res, next) => {
   const placeId = req.params.pid;
 
-  if (!DUMMY_PLACES.find((p) => p.id === placeId)) {
-    throw new HttpError('Could not find a place for that id.', 404);
+  let place;
+  try {
+    place = await Place.findById(placeId)
+  } catch (err) {
+    const error = new HttpError(
+      'Could not find place with the given id', 500
+    );
+    return next(error)
   }
 
-  DUMMY_PLACES = DUMMY_PLACES.filter((p) => p.id !== placeId);
+  try {
+    await place.remove()
+  } catch (err) {
+    const error = new HttpError('Something went wrong, could not delete place', 500);
+    return next(error)
+  }
+
   res.status(200).json({ message: 'Deleted Place!' });
 });
 
