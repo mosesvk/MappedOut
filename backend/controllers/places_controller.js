@@ -4,6 +4,7 @@ import { validationResult } from 'express-validator';
 import { HttpError } from '../models/errorHandler.js';
 import { getCoordsForAddress } from '../util/location.js';
 import Place from '../models/placeModel.js';
+import User from '../models/userModel.js';
 
 //@desc     Fetch all places
 //@route    GET /api/places
@@ -104,6 +105,13 @@ const createPlace = asyncHandler(async (req, res, next) => {
       'https://www.pandotrip.com/wp-content/uploads/2016/01/colosseum-980x575.jpg',
     creator,
   });
+
+  let user
+  try {
+    user = await User.findById(creator)
+  } catch (err) {
+    return next(new HttpError('Creating place failed, please try again', 500))
+  }
 
   try {
     await createdPlace.save();
