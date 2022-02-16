@@ -1,10 +1,12 @@
 import { v4 as uuid } from 'uuid';
+import mongoose from 'mongoose';
 import asyncHandler from 'express-async-handler';
 import { validationResult } from 'express-validator';
 import { HttpError } from '../models/errorHandler.js';
 import { getCoordsForAddress } from '../util/location.js';
 import Place from '../models/placeModel.js';
 import User from '../models/userModel.js';
+
 
 //@desc     Fetch all places
 //@route    GET /api/places
@@ -110,13 +112,24 @@ const createPlace = asyncHandler(async (req, res, next) => {
   try {
     user = await User.findById(creator)
   } catch (err) {
-    return next(new HttpError('Creating place failed, please try again', 500))
+    return next(new HttpError('Creating place failed, could find Creator, please try again', 500))
   }
 
+  if (!user) {
+    next(new HttpError('Could not find user for provided id', 404))
+  }
+
+  console.log(createdPlace)
+
   try {
-    await createdPlace.save();
+    const sess = await mongoose.startSession();
+    sess.startTransaction();
+    await createdPlace.save({ session: sess });
+    user.places.push(createdPlace);
+    await user.save({ session: sess });
+    await sess.commitTransaction();
   } catch (error) {
-    return next(new HttpError('Creating Place Failed, please try again', 500));
+    return next(new HttpError('Creating Place Failed at the mongoose.startSessions, please try again', 500));
   }
 
   res.status(201).json({ place: createdPlace });
