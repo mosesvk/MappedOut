@@ -101,12 +101,12 @@ const createPlace = asyncHandler(async (req, res, next) => {
     address,
     location: coordinates,
     image:
-      'https://mpng.subpng.com/20180411/rzw/kisspng-user-profile-computer-icons-user-interface-mystique-5aceb0245aa097.2885333015234949483712.jpg',
+      'https://www.pandotrip.com/wp-content/uploads/2016/01/colosseum-980x575.jpg',
     creator,
   });
 
   try {
-    createdPlace.save();
+    await createdPlace.save();
   } catch (error) {
     return next(new HttpError('Creating Place Failed, please try again', 500));
   }
