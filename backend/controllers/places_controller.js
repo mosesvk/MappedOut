@@ -9,9 +9,9 @@ import Place from '../models/placeModel.js';
 //@route    GET /api/places
 //@access   Public
 const getPlaces = asyncHandler(async (req, res) => {
-  let places
+  let places;
   try {
-    places = await Place.find()
+    places = await Place.find();
     res.json({ places });
   } catch (error) {
     console.log(error.message);
@@ -125,19 +125,35 @@ const updatePlace = asyncHandler(async (req, res, next) => {
     throw new HttpError('Invalid inputs passed, please check your data', 422);
   }
 
-  const { title, description, address } = req.body;
+  const { title, description, address, creator} = req.body;
   const placeId = req.params.pid;
 
-  const updatedPlace = { ...DUMMY_PLACES.find((p) => p.id === placeId) };
-  // we only want to make a copy of it first so that once that copy is updated... THEN we can replace the actual dummy_places array with the updated copy.
-  const placeIndex = DUMMY_PLACES.findIndex((p) => p.id === placeId);
+  let place;
+  try {
+    place = await Place.findById(placeId);
+  } catch (err) {
+    const error = new HttpError(
+      'Something went wrong, could not update place.',
+      500
+    );
+    return next(error);
+  }
 
-  updatedPlace.title = title;
-  updatedPlace.description = description;
+  place.title = title;
+  place.description = description;
+  place.address = address;
 
-  DUMMY_PLACES[placeIndex] = updatedPlace;
+  try {
+    await place.save();
+  } catch (err) {
+    const error = new HttpError(
+      'Something went wrong at saving, could not update place.',
+      500
+    );
+    return next(error);
+  }
 
-  res.status(200).json({ place: updatedPlace });
+  res.status(200).json({ place: place.toObject({ getters: true }) });
 });
 
 //@desc     DELETE Place
