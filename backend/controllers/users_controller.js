@@ -5,21 +5,22 @@ import { HttpError } from '../models/errorHandler.js';
 
 import User from '../models/userModel.js';
 
-const DUMMY_USERS = [
-  {
-    id: 'u1',
-    name: 'Test',
-    email: 'test@test.com',
-    password: 'testers',
-  },
-];
-
 // ------------------------
 //@desc     Fetch all users
 //@route    GET /api/users
 //@access   Private
 const getAllUsers = asyncHandler(async (req, res, next) => {
-  res.json({ users: DUMMY_USERS });
+  let users;
+  try {
+    users = await User.find({}, '-password');
+  } catch (err) {
+    const error = new HttpError(
+      'Fetching users failed, please try again later.',
+      500
+    );
+    return next(error);
+  }
+  res.json({ users: users.map(user => user.toObject({ getters: true })) });
 });
 
 // ------------------------
@@ -102,7 +103,7 @@ const signup = async (req, res, next) => {
   res
     .status(201)
     .json({ userId: createdUser.id, email: createdUser.email, token: token });
-};
+}
 
 //@desc     login user
 //@route    GET /api/users
@@ -110,13 +111,17 @@ const signup = async (req, res, next) => {
 const login = asyncHandler(async (req, res, next) => {
   const { email, password } = req.body;
 
-  const identifiedUser = DUMMY_USERS.find((u) => u.email === email);
-  if (!identifiedUser) {
-    throw new HttpError(
-      'Could not identify user, credentials seem to be wrong',
-      401
-    );
+  let existingUser
+  try {
+    existingUser = await User.findOne({email: email})
+  } catch (err) {
+    return next(new HttpError('Logging in failed, please try again later', 500))
   }
+
+  if (!existingUser || existingUser.password !== password) {
+    return next(new HttpError('Invalid credentials, could not log you in', 401))
+  }
+
   res.json({ message: 'Logged In' });
 });
 
