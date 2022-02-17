@@ -1,4 +1,6 @@
 import React, { useState, useCallback } from 'react';
+import dotenv from 'dotenv'
+
 import {
   BrowserRouter as Router,
 } from 'react-router-dom';
@@ -7,6 +9,9 @@ import { AuthContext } from './shared/context/auth-context';
 import routes from './routes';
 
 const App = () => {
+  dotenv.config();
+
+  console.log(process.env)
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const login = useCallback(() => {

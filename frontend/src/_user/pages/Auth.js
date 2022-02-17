@@ -53,10 +53,11 @@ const Auth = () => {
     }
     setIsLoginMode(prevMode => !prevMode);
   };
+  console.log(process.env.REACT_APP_GOOGLE_API_KEY)
 
   const authSubmitHandler = event => {
     event.preventDefault();
-    console.log(formState.inputs);
+     
     auth.login();
   };
 
