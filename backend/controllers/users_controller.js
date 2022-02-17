@@ -1,5 +1,6 @@
 import { v4 as uuid } from 'uuid';
 import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken'
 import { validationResult } from 'express-validator';
 import asyncHandler from 'express-async-handler';
 import { HttpError } from '../models/errorHandler.js';
@@ -86,20 +87,20 @@ const signup = async (req, res, next) => {
     return next(error);
   }
 
-  // let token;
-  // try {
-  //   token = jwt.sign(
-  //     { userId: createdUser.id, email: createdUser.email },
-  //     process.env.JWT_KEY,
-  //     { expiresIn: '1h' }
-  //   );
-  // } catch (err) {
-  //   const error = new HttpError(
-  //     'Signing up failed, please try again later.',
-  //     500
-  //   );
-  //   return next(error);
-  // }
+  let token;
+  try {
+    token = jwt.sign(
+      { userId: createdUser.id, email: createdUser.email },
+      process.env.JWT_KEY,
+      { expiresIn: '1h' }
+    );
+  } catch (err) {
+    const error = new HttpError(
+      'Signing up failed, please try again later.',
+      500
+    );
+    return next(error);
+  }
 
   res
     .status(201)

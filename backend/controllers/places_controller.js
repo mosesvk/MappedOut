@@ -7,14 +7,13 @@ import { getCoordsForAddress } from '../util/location.js';
 import Place from '../models/placeModel.js';
 import User from '../models/userModel.js';
 
-
 //@desc     Fetch all places
 //@route    GET /api/places
 //@access   Public
 const getPlaces = asyncHandler(async (req, res) => {
   let places;
   try {
-    places = await Place.find()
+    places = await Place.find();
     res.json({ places });
   } catch (error) {
     console.log(error.message);
@@ -108,28 +107,39 @@ const createPlace = asyncHandler(async (req, res, next) => {
     creator,
   });
 
-  let user
+  let user;
   try {
-    user = await User.findById(creator)
+    user = await User.findById(creator);
   } catch (err) {
-    return next(new HttpError('Creating place failed, could find Creator, please try again', 500))
+    return next(
+      new HttpError(
+        'Creating place failed, could not find Creator, please try again',
+        500
+      )
+    );
   }
 
   if (!user) {
-    next(new HttpError('Could not find user for provided id', 404))
+    next(new HttpError('Could not find user for provided id', 404));
   }
 
-  console.log(createdPlace)
 
   try {
     const sess = await mongoose.startSession();
     sess.startTransaction();
     await createdPlace.save({ session: sess });
     user.places.push(createdPlace);
+    console.log(user)
+    console.log('hit');
     await user.save({ session: sess });
     await sess.commitTransaction();
   } catch (error) {
-    return next(new HttpError('Creating Place Failed at the mongoose.startSessions, please try again', 500));
+    return next(
+      new HttpError(
+        'Creating Place Failed at the mongoose.startSessions, please try again',
+        500
+      )
+    );
   }
 
   res.status(201).json({ place: createdPlace });
@@ -146,7 +156,7 @@ const updatePlace = asyncHandler(async (req, res, next) => {
     throw new HttpError('Invalid inputs passed, please check your data', 422);
   }
 
-  const { title, description, address, creator} = req.body;
+  const { title, description, address, creator } = req.body;
   const placeId = req.params.pid;
 
   let place;
@@ -185,19 +195,20 @@ const deletePlace = asyncHandler(async (req, res, next) => {
 
   let place;
   try {
-    place = await Place.findById(placeId)
+    place = await Place.findById(placeId);
   } catch (err) {
-    const error = new HttpError(
-      'Could not find place with the given id', 500
-    );
-    return next(error)
+    const error = new HttpError('Could not find place with the given id', 500);
+    return next(error);
   }
 
   try {
-    await place.remove()
+    await place.remove();
   } catch (err) {
-    const error = new HttpError('Something went wrong, could not delete place', 500);
-    return next(error)
+    const error = new HttpError(
+      'Something went wrong, could not delete place',
+      500
+    );
+    return next(error);
   }
 
   res.status(200).json({ message: 'Deleted Place!' });
