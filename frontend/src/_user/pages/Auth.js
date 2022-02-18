@@ -70,7 +70,7 @@ const Auth = () => {
       })
     })
 
-    auth.login();
+    const responseData = await response.json()
   };
 
   return (
