@@ -13,6 +13,7 @@ import { AuthContext } from '../../shared/context/auth-context';
 import './Auth.css';
 
 const Auth = () => {
+
   const auth = useContext(AuthContext);
   const [isLoginMode, setIsLoginMode] = useState(true);
 
@@ -53,11 +54,22 @@ const Auth = () => {
     }
     setIsLoginMode(prevMode => !prevMode);
   };
-  console.log(process.env.REACT_APP_GOOGLE_API_KEY)
 
   const authSubmitHandler = event => {
     event.preventDefault();
-     
+    
+    fetch(`${process.env.REACT_APP_ASSET_URL}/api/users/signup`, {
+      method: 'POST', 
+      headers: {
+        'Content-Type': 'application/json'
+      }, 
+      body: JSON.stringify({
+        name: formState.inputs.name.value,
+        email: formState.inputs.email.value,
+        password: formState.inputs.password.value,
+      })
+    })
+
     auth.login();
   };
 
