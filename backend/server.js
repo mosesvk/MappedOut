@@ -18,6 +18,19 @@ const PORT = process.env.PORT;
 
 app.use(bodyParser.json());
 
+app.use((req, res, next) => {
+  // this is allowing which domains have access to the backend. the '*' means ALL domains
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  // We also have to specify what specific headers can be modified. 'Content-Type' and 'Authorization' is NOT automatically set and which is what we will do
+  res.setHeader(
+    'Access-Control-Allow-Headers',
+    'Origin, X-Requested-With, Content-Type, Accept, Authorization'
+  );
+  // We also want to specify which type of requests we want to send. 
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, DELETE')
+  next();
+});
+
 app.use('/api/places', placesRoutes);
 app.use('/api/users', userRoutes);
 
