@@ -52,6 +52,10 @@ const UpdatePlace = () => {
             description: {
               value: responseData.place.description,
               isValid: true
+            },
+            address: {
+              value: responseData.place.address,
+              isValid: true
             }
           },
           true
@@ -70,7 +74,8 @@ const UpdatePlace = () => {
         'PATCH',
         JSON.stringify({
           title: formState.inputs.title.value,
-          description: formState.inputs.description.value
+          description: formState.inputs.description.value,
+          address: formState.inputs.address
         }),
         {
           'Content-Type': 'application/json'
@@ -122,6 +127,16 @@ const UpdatePlace = () => {
             errorText="Please enter a valid description (min. 5 characters)."
             onInput={inputHandler}
             initialValue={loadedPlace.description}
+            initialValid={true}
+          />
+          <Input
+            id="address"
+            element="textarea"
+            label="Address"
+            validators={[VALIDATOR_MINLENGTH()]}
+            errorText="Please enter a valid Address."
+            onInput={inputHandler}
+            initialValue={loadedPlace.address}
             initialValid={true}
           />
           <Button type="submit" disabled={!formState.isValid}>
