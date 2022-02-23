@@ -5,11 +5,13 @@ import Input from '../../shared/components/FormElements/Input';
 import Button from '../../shared/components/FormElements/Button';
 import ErrorModal from '../../shared/components/UIElements/ErrorModal';
 import LoadingSpinner from '../../shared/components/UIElements/LoadingSpinner';
+import ImageUpload from '../../shared/components/FormElements/ImageUpload';
 import {
   VALIDATOR_EMAIL,
   VALIDATOR_MINLENGTH,
   VALIDATOR_REQUIRE,
 } from '../../shared/util/validators';
+// form-hook is where we are using our useCallback and useReducer
 import { useForm } from '../../shared/hooks/form-hook';
 import { useHttpClient } from '../../shared/hooks/http-hook';
 import { AuthContext } from '../../shared/context/auth-context';
@@ -21,6 +23,7 @@ const Auth = () => {
   const { isLoading, error, sendRequest, clearError } = useHttpClient();
   const Navigate = useNavigate();
 
+  // inputHandler will be forwarded to our form validation 
   const [formState, inputHandler, setFormData] = useForm(
     {
       email: {
@@ -41,6 +44,7 @@ const Auth = () => {
         {
           ...formState.inputs,
           name: undefined,
+          image: undefined,
         },
         formState.inputs.email.isValid && formState.inputs.password.isValid
       );
@@ -52,6 +56,10 @@ const Auth = () => {
             value: '',
             isValid: false,
           },
+          image: {
+            value: null,
+            isValid: false,
+          },
         },
         false
       );
@@ -61,7 +69,6 @@ const Auth = () => {
 
   const authSubmitHandler = async (event) => {
     event.preventDefault();
-
     if (isLoginMode) {
       try {
         const responseData = await sendRequest(
@@ -76,7 +83,7 @@ const Auth = () => {
           }
         );
         auth.login(responseData.user.id);
-        Navigate('/')
+        Navigate('/');
       } catch (err) {}
     } else {
       try {
@@ -85,6 +92,7 @@ const Auth = () => {
           'POST',
           JSON.stringify({
             name: formState.inputs.name.value,
+            image: formState.inputs.image.value,
             email: formState.inputs.email.value,
             password: formState.inputs.password.value,
           }),
@@ -92,9 +100,9 @@ const Auth = () => {
             'Content-Type': 'application/json',
           }
         );
-
+        console.log('hit')
         auth.login(responseData.user.id);
-        Navigate('/')
+        Navigate('/');
       } catch (err) {}
     }
   };
@@ -104,8 +112,9 @@ const Auth = () => {
       <ErrorModal error={error} onClear={clearError} />
       <Card className='authentication'>
         {isLoading && <LoadingSpinner asOverlay />}
-        <h2>Login Required</h2>
-        <hr />
+        {isLoginMode && <h2>Login Screen</h2>}
+        {!isLoginMode && <h2>Signup!</h2>} 
+        <hr />       
         <form onSubmit={authSubmitHandler}>
           {!isLoginMode && (
             <Input
@@ -116,6 +125,14 @@ const Auth = () => {
               validators={[VALIDATOR_REQUIRE()]}
               errorText='Please enter a name.'
               onInput={inputHandler}
+            />
+          )}
+          {!isLoginMode && (
+            <ImageUpload
+              center
+              id='image'
+              onInput={inputHandler}
+              errorText='Please provide an image.'
             />
           )}
           <Input

@@ -15,7 +15,7 @@ const inputReducer = (state, action) => {
       return {
         ...state,
         isTouched: true
-      }
+      };
     }
     default:
       return state;
@@ -33,7 +33,8 @@ const Input = props => {
   const { value, isValid } = inputState;
 
   useEffect(() => {
-    onInput(id, value, isValid)
+    // forwards to our ImageUpload.js file line 37
+    onInput(id, value, isValid);
   }, [id, value, isValid, onInput]);
 
   const changeHandler = event => {
@@ -72,7 +73,8 @@ const Input = props => {
 
   return (
     <div
-      className={`form-control ${!inputState.isValid && inputState.isTouched &&
+      className={`form-control ${!inputState.isValid &&
+        inputState.isTouched &&
         'form-control--invalid'}`}
     >
       <label htmlFor={props.id}>{props.label}</label>
