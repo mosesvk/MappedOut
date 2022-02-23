@@ -72,6 +72,7 @@ const UpdatePlace = () => {
 
   const placeUpdateSubmitHandler = async event => {
     event.preventDefault();
+    console.log(formState.inputs)
     try {
       await sendRequest(
         `${process.env.REACT_APP_ASSET_URL}/api/places/${placeId}`,
@@ -79,7 +80,7 @@ const UpdatePlace = () => {
         JSON.stringify({
           title: formState.inputs.title.value,
           description: formState.inputs.description.value,
-          address: formState.inputs.address
+          address: formState.inputs.address.value
         }),
         {
           'Content-Type': 'application/json'
