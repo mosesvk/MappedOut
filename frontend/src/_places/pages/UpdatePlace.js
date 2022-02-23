@@ -72,7 +72,6 @@ const UpdatePlace = () => {
 
   const placeUpdateSubmitHandler = async event => {
     event.preventDefault();
-    console.log(formState.inputs)
     try {
       await sendRequest(
         `${process.env.REACT_APP_ASSET_URL}/api/places/${placeId}`,
