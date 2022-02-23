@@ -150,7 +150,7 @@ const updatePlace = asyncHandler(async (req, res, next) => {
     throw new HttpError('Invalid inputs passed, please check your data', 422);
   }
 
-  const { title, description, address, creator } = req.body;
+  const { title, description, address } = req.body;
   const placeId = req.params.pid;
 
   let place;

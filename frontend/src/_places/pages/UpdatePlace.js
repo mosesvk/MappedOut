@@ -31,6 +31,10 @@ const UpdatePlace = () => {
       description: {
         value: '',
         isValid: false
+      }, 
+      address: {
+        value: '',
+        isValid: false
       }
     },
     false
@@ -131,9 +135,10 @@ const UpdatePlace = () => {
           />
           <Input
             id="address"
+            type="text"
             element="textarea"
             label="Address"
-            validators={[VALIDATOR_MINLENGTH()]}
+            validators={[VALIDATOR_REQUIRE()]}
             errorText="Please enter a valid Address."
             onInput={inputHandler}
             initialValue={loadedPlace.address}
