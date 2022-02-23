@@ -124,7 +124,7 @@ const login = asyncHandler(async (req, res, next) => {
     return next(new HttpError('Invalid credentials, could not log you in', 401))
   }
 
-  res.json({ message: 'Logged In' });
+  res.json({ message: 'Logged In', user: existingUser.toObject({getters: true}) });
 });
 
 export { getAllUsers, signup, login };

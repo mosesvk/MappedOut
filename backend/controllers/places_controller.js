@@ -75,17 +75,16 @@ const getPlacesByUserId = asyncHandler(async (req, res) => {
 //@desc     CREATE Place
 //@route    GET /api/places
 //@access   Public
-const createPlace = asyncHandler(async (req, res, next) => {
-  // this validationResult is connected to the check() function. This is all through express-validator to validate information
+const createPlace = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    console.log(errors);
     return next(
-      new HttpError('Invalid inputs passed, please check your data', 422)
+      new HttpError('Invalid inputs passed, please check your data.', 422)
     );
   }
 
   const { title, description, address, creator } = req.body;
+  console.log(req.body)
 
   let coordinates;
   try {
@@ -100,47 +99,45 @@ const createPlace = asyncHandler(async (req, res, next) => {
     address,
     location: coordinates,
     image:
-      'https://www.pandotrip.com/wp-content/uploads/2016/01/colosseum-980x575.jpg',
-    creator,
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Empire_State_Building_%28aerial_view%29.jpg/400px-Empire_State_Building_%28aerial_view%29.jpg', // => File Upload module, will be replaced with real image url
+    creator
   });
+
 
   let user;
   try {
     user = await User.findById(creator);
   } catch (err) {
-    return next(
-      new HttpError(
-        'Creating place failed, could not find Creator, please try again',
-        500
-      )
+    const error = new HttpError(
+      'Creating place failed, please try again.',
+      500
     );
+    return next(error);
   }
-
   if (!user) {
-    next(new HttpError('Could not find user for provided id', 404));
+    const error = new HttpError('Could not find user for provided id.', 404);
+    return next(error);
   }
 
+  //console.log(user);
 
   try {
     const sess = await mongoose.startSession();
     sess.startTransaction();
-    await createdPlace.save({ session: sess });
-    user.places.push(createdPlace);
-    console.log(user)
-    console.log('hit');
-    await user.save({ session: sess });
+    await createdPlace.save({ session: sess }); 
+    user.places.push(createdPlace); 
+    await user.save({ session: sess }); 
     await sess.commitTransaction();
-  } catch (error) {
-    return next(
-      new HttpError(
-        'Creating Place Failed at the mongoose.startSessions, please try again',
-        500
-      )
+  } catch (err) {
+    const error = new HttpError(
+      'Creating place failed, please try again.',
+      500
     );
+    return next(error);
   }
 
   res.status(201).json({ place: createdPlace });
-});
+};
 
 //@desc     UPDATE Place
 //@route    GET /api/places/:pid
