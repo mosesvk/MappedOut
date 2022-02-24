@@ -1,3 +1,5 @@
+import fs from 'fs'
+import path from 'path'
 import express from 'express';
 import bodyParser from 'body-parser';
 import colors from 'colors';
@@ -18,6 +20,8 @@ const PORT = process.env.PORT;
 
 app.use(bodyParser.json());
 
+app.use('/uploads/images ', express.static(path.join('uploads', 'images')));
+
 app.use((req, res, next) => {
   // this is allowing which domains have access to the backend. the '*' means ALL domains
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -36,8 +40,21 @@ app.use('/api/users', userRoutes);
 
 // error no route found
 app.use((req, res, next) => {
-  const error = new HttpError('Could not find this route', 404);
+  const error = new HttpError('Could not find this route.', 404);
   throw error;
+});
+
+app.use((req, res, next) => {
+  if (req.file) {
+    fs.unlink(req.file.path, err => {
+      console.log(err);
+    });
+  }
+  if (res.headerSent) {
+    return next(error);
+  }
+  res.status(error.code || 500);
+  res.json({ message: error.message || 'An unknown error occurred!' });
 });
 
 //error middleware function

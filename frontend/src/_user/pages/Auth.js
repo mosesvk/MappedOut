@@ -23,7 +23,7 @@ const Auth = () => {
   const { isLoading, error, sendRequest, clearError } = useHttpClient();
   const Navigate = useNavigate();
 
-  // inputHandler will be forwarded to our form validation 
+  // inputHandler will be forwarded to our form validation
   const [formState, inputHandler, setFormData] = useForm(
     {
       email: {
@@ -87,22 +87,19 @@ const Auth = () => {
       } catch (err) {}
     } else {
       try {
+        const formData = new FormData();
+        formData.append('email', formState.inputs.email.value);
+        formData.append('name', formState.inputs.name.value);
+        formData.append('password', formState.inputs.password.value);
+        formData.append('image', formState.inputs.image.value);
+
         const responseData = await sendRequest(
           `${process.env.REACT_APP_ASSET_URL}/api/users/signup`,
           'POST',
-          JSON.stringify({
-            name: formState.inputs.name.value,
-            image: formState.inputs.image.value,
-            email: formState.inputs.email.value,
-            password: formState.inputs.password.value,
-          }),
-          {
-            'Content-Type': 'application/json',
-          }
+          formData
         );
-        console.log('hit')
+
         auth.login(responseData.user.id);
-        Navigate('/');
       } catch (err) {}
     }
   };
@@ -113,8 +110,8 @@ const Auth = () => {
       <Card className='authentication'>
         {isLoading && <LoadingSpinner asOverlay />}
         {isLoginMode && <h2>Login Screen</h2>}
-        {!isLoginMode && <h2>Signup!</h2>} 
-        <hr />       
+        {!isLoginMode && <h2>Signup!</h2>}
+        <hr />
         <form onSubmit={authSubmitHandler}>
           {!isLoginMode && (
             <Input

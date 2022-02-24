@@ -44,7 +44,7 @@ const signup = async (req, res, next) => {
     existingUser = await User.findOne({ email: email });
   } catch (err) {
     const error = new HttpError(
-      'There as already a User with this Email',
+      'Signing up failed, please try again later.',
       500
     );
     return next(error);
@@ -58,23 +58,12 @@ const signup = async (req, res, next) => {
     return next(error);
   }
 
-  let hashedPassword;
-  try {
-    hashedPassword = await bcrypt.hash(password, 12);
-  } catch (err) {
-    const error = new HttpError(
-      'Could not create user, please try again.',
-      500
-    );
-    return next(error);
-  }
-
   const createdUser = new User({
     name,
     email,
-    image: 'https://e7.pngegg.com/pngimages/178/595/png-clipart-user-profile-computer-icons-login-user-avatars-monochrome-black-thumbnail.png',
-    password: hashedPassword,
-    places: []
+    image: req.file.path,
+    password,
+    places: [],
   });
 
   try {
@@ -87,24 +76,7 @@ const signup = async (req, res, next) => {
     return next(error);
   }
 
-  let token;
-  try {
-    token = jwt.sign(
-      { userId: createdUser.id, email: createdUser.email },
-      process.env.JWT_KEY,
-      { expiresIn: '1h' }
-    );
-  } catch (err) {
-    const error = new HttpError(
-      'Signing up failed, please try again later.',
-      500
-    );
-    return next(error);
-  }
-
-  res
-    .status(201)
-    .json({ message: 'User Created' });
+  res.status(201).json({ user: createdUser.toObject({ getters: true }) });
 };
 
 //@desc     login user
