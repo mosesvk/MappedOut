@@ -33,7 +33,6 @@ const Input = props => {
   const { value, isValid } = inputState;
 
   useEffect(() => {
-    // forwards to our ImageUpload.js file line 37
     onInput(id, value, isValid);
   }, [id, value, isValid, onInput]);
 

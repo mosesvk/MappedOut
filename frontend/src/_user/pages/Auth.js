@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
+
 import Card from '../../shared/components/UIElements/Card';
 import Input from '../../shared/components/FormElements/Input';
 import Button from '../../shared/components/FormElements/Button';
@@ -9,9 +9,8 @@ import ImageUpload from '../../shared/components/FormElements/ImageUpload';
 import {
   VALIDATOR_EMAIL,
   VALIDATOR_MINLENGTH,
-  VALIDATOR_REQUIRE,
+  VALIDATOR_REQUIRE
 } from '../../shared/util/validators';
-// form-hook is where we are using our useCallback and useReducer
 import { useForm } from '../../shared/hooks/form-hook';
 import { useHttpClient } from '../../shared/hooks/http-hook';
 import { AuthContext } from '../../shared/context/auth-context';
@@ -21,9 +20,7 @@ const Auth = () => {
   const auth = useContext(AuthContext);
   const [isLoginMode, setIsLoginMode] = useState(true);
   const { isLoading, error, sendRequest, clearError } = useHttpClient();
-  const Navigate = useNavigate();
 
-  // inputHandler will be forwarded to our form validation
   const [formState, inputHandler, setFormData] = useForm(
     {
       email: {
@@ -73,8 +70,8 @@ const Auth = () => {
     if (isLoginMode) {
       try {
         const responseData = await sendRequest(
-          `${process.env.REACT_APP_ASSET_URL}/api/users/login`,
-          'POST',
+          `${process.env.REACT_APP_ASSET_URL}/api/users/login',
+          'POST`,
           JSON.stringify({
             email: formState.inputs.email.value,
             password: formState.inputs.password.value
@@ -83,8 +80,7 @@ const Auth = () => {
             'Content-Type': 'application/json'
           }
         );
-        auth.login(responseData.user.id);
-        Navigate('/')
+        auth.login(responseData.userId, responseData.token);
       } catch (err) {}
     } else {
       try {
@@ -98,14 +94,14 @@ const Auth = () => {
           'POST',
           formData
         );
-        auth.login(responseData.user.id);
-        Navigate('/')
+
+        auth.login(responseData.userId, responseData.token);
       } catch (err) {}
     }
   };
 
   return (
-    <>
+    <React.Fragment>
       <ErrorModal error={error} onClear={clearError} />
       <Card className="authentication">
         {isLoading && <LoadingSpinner asOverlay />}
@@ -157,7 +153,7 @@ const Auth = () => {
           SWITCH TO {isLoginMode ? 'SIGNUP' : 'LOGIN'}
         </Button>
       </Card>
-    </>
+    </React.Fragment>
   );
 };
 

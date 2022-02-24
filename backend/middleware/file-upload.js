@@ -1,5 +1,5 @@
-import multer from 'multer';
-import { v4 as uuid } from 'uuid';
+import multer from 'multer'
+import {v4 as uuid} from 'uuid'
 
 const MIME_TYPE_MAP = {
   'image/png': 'png',
@@ -7,7 +7,7 @@ const MIME_TYPE_MAP = {
   'image/jpg': 'jpg'
 };
 
-export const fileUpload = multer({
+const fileUpload = multer({
   limits: 500000,
   storage: multer.diskStorage({
     destination: (req, file, cb) => {
@@ -25,4 +25,4 @@ export const fileUpload = multer({
   }
 });
 
-// export default fileUpload
+export default fileUpload;

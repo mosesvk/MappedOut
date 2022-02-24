@@ -31,10 +31,6 @@ const UpdatePlace = () => {
       description: {
         value: '',
         isValid: false
-      }, 
-      address: {
-        value: '',
-        isValid: false
       }
     },
     false
@@ -56,15 +52,10 @@ const UpdatePlace = () => {
             description: {
               value: responseData.place.description,
               isValid: true
-            },
-            address: {
-              value: responseData.place.address,
-              isValid: true
             }
           },
           true
         );
-
       } catch (err) {}
     };
     fetchPlace();
@@ -78,11 +69,11 @@ const UpdatePlace = () => {
         'PATCH',
         JSON.stringify({
           title: formState.inputs.title.value,
-          description: formState.inputs.description.value,
-          address: formState.inputs.address.value
+          description: formState.inputs.description.value
         }),
         {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + auth.token
         }
       );
       navigate('/' + auth.userId + '/places');
@@ -131,17 +122,6 @@ const UpdatePlace = () => {
             errorText="Please enter a valid description (min. 5 characters)."
             onInput={inputHandler}
             initialValue={loadedPlace.description}
-            initialValid={true}
-          />
-          <Input
-            id="address"
-            type="text"
-            element="textarea"
-            label="Address"
-            validators={[VALIDATOR_REQUIRE()]}
-            errorText="Please enter a valid Address."
-            onInput={inputHandler}
-            initialValue={loadedPlace.address}
             initialValid={true}
           />
           <Button type="submit" disabled={!formState.isValid}>

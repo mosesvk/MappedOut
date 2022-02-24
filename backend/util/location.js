@@ -34,4 +34,4 @@ const getCoordsForAddress = async (address) => {
   return coordinates;
 };
 
-export { getCoordsForAddress };
+export default { getCoordsForAddress };
